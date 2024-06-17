@@ -133,22 +133,24 @@ app.get("/grid/:id", (req, res, next) => {
     if (req.params.id == null) {
       res.status(400).send("id is null");
     } else {
-      res.send(
-        JSON.parse(
-          JSON.stringify(grid, [
-            "id",
-            "line0",
-            "line1",
-            "line2",
-            "line3",
-            "line4",
-            "line5",
-            "line6",
-            "line7",
-            "line8",
-          ])
-        )
-      );
+      res
+        .status(200)
+        .send(
+          JSON.parse(
+            JSON.stringify(grid, [
+              "id",
+              "line0",
+              "line1",
+              "line2",
+              "line3",
+              "line4",
+              "line5",
+              "line6",
+              "line7",
+              "line8",
+            ])
+          )
+        );
     }
   })();
 });
@@ -193,16 +195,36 @@ app.put("/grid/:id", (req, res, next) => {
     if (grid == null) res.status(404).send("Grid does not exists");
     else {
       await grid.destroy();
-      console.log(await Grid.findByPk(19));
       const updatedGrid = await Grid.create({
-        id: req.params.id,
-        quadrants: req.body.quadrants,
+        line0: req.body.line0,
+        line1: req.body.line1,
+        line2: req.body.line2,
+        line3: req.body.line3,
+        line4: req.body.line4,
+        line5: req.body.line5,
+        line6: req.body.line6,
+        line7: req.body.line7,
+        line8: req.body.line8,
       });
       updatedGrid.save();
-      res.status(200).send({
-        id: updatedGrid.id,
-        quadrants: updatedGrid.quadrants,
-      });
+      res
+        .status(200)
+        .send(
+          JSON.parse(
+            JSON.stringify(grid, [
+              "id",
+              "line0",
+              "line1",
+              "line2",
+              "line3",
+              "line4",
+              "line5",
+              "line6",
+              "line7",
+              "line8",
+            ])
+          )
+        );
     }
   })();
 });
