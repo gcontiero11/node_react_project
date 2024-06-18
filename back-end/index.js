@@ -323,61 +323,75 @@ app.get("/game/:id", [
 app.post("/game", [
   verificaJWT,
   async (req, res, next) => {
-    (async () => {
-      try {
-        const game = await createGame(req.body);
-        res.status(201).json(gameToResponse(game));
-      } catch (error) {
-        res.status(400).json({ error: error.message });
-      }
-    })();
+    try {
+      const game = await createGame(req.body);
+      res.status(201).json(gameToResponse(game));
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
   },
 ]);
 
 app.put("/game/:id", [
   verificaJWT,
   async (req, res, next) => {
-    (async () => {
-      try {
-        const game = await Game.findByPk(req.params.id);
-        if (game) {
-          await game.update(req.body);
-          res.json(game);
-        } else {
-          res.status(404).json({ error: "Game not found" });
-        }
-      } catch (error) {
-        res.status(400).json({ error: error.message });
+    try {
+      const game = await Game.findByPk(req.params.id);
+      if (game) {
+        await game.update(req.body);
+        res.json(game);
+      } else {
+        res.status(404).json({ error: "Game not found" });
       }
-    })();
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
   },
 ]);
 
 app.delete("/game/:id", [
   verificaJWT,
   async (req, res, next) => {
-    (async () => {
-      try {
-        const game = await Game.findByPk(req.params.id);
-        if (game) {
-          await game.destroy();
-          res.status(204).end();
-        } else {
-          res.status(404).json({ error: "Game not found" });
-        }
-      } catch (error) {
-        res.status(500).json({ error: error.message });
+    try {
+      const game = await Game.findByPk(req.params.id);
+      if (game) {
+        await game.destroy();
+        res.status(204).end();
+      } else {
+        res.status(404).json({ error: "Game not found" });
       }
-    })();
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   },
 ]);
 
 async function createGame(body) {
+  const grid = Grid.findByPk(body.grid_id);
+  const gridContent = JSON.parse(
+    grid.line0 +
+      "," +
+      grid.line1 +
+      "," +
+      grid.line2 +
+      "," +
+      grid.line3 +
+      "," +
+      grid.line4 +
+      "," +
+      grid.line5 +
+      "," +
+      grid.line6 +
+      "," +
+      grid.line7 +
+      "," +
+      grid.line8
+  );
   return Game.create({
     difficult: body.difficult,
     hasEnded: false,
     user_id_fk: body.user_id,
-    grid: body.grid,
+    grid: gridContent,
   });
 }
 
