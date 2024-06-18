@@ -1,5 +1,7 @@
 const banco = require("../bd.js");
 const Sequelize = require("sequelize");
+const User = require("./User.js");
+const Grid = require("./Grid.js");
 
 const Game = banco.define("game", {
   id: {
@@ -8,7 +10,7 @@ const Game = banco.define("game", {
     allowNull: false,
     primaryKey: true,
   },
-  dificuldade: {
+  difficult: {
     type: Sequelize.INTEGER,
     allowNull: false,
     primaryKey: false,
@@ -19,24 +21,20 @@ const Game = banco.define("game", {
     primaryKey: false
   },
   user_id_fk: {
-    type: DataTypes.INTEGER,
+    type: Sequelize.DataTypes.INTEGER,
     allowNull: false,
+    unique: true,
     references: {
       model: User,
       key: "id",
-    },
+    }
   },
-  grid_id_fk: {
-    type: DataTypes.INTEGER,
+  grid: {
+    type: Sequelize.DataTypes.JSON,
     allowNull: false,
-    references: {
-      model: Grid,
-      key: "id",
-    },
   },
 });
 
 Game.belongsTo(User, { foreignKey: 'user_id_fk' });
-Game.belongsTo(Grid, { foreignKey: 'grid_id_fk' });
 
 module.exports = Game;
