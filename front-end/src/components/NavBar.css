@@ -1,0 +1,41 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 10px 20px;
+    color: white;
+  }
+  
+  .navbar-left {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .navbar-button {
+    background-color: #444;
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+  }
+  
+  .navbar-button:hover {
+    background-color: #555;
+  }
+  
+  .special {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .special:hover {
+    background-color: #0056b3;
+  }
+  
+  .navbar-right {
+    font-size: 16px;
+  }
