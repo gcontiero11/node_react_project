@@ -5,10 +5,11 @@ import './Fases.css';
 const Fases = ({ fases }) => {
   const navigate = useNavigate();
 
-  const handleFaseClick = (nomeFase, desbloqueada) => {
+  const handleFaseClick = (nomeFase,numeroFase, desbloqueada) => {
     if (desbloqueada) {
-      navigate(`/partida/${nomeFase}`);
+      navigate(`/partida/${nomeFase}/${numeroFase}`);
     }
+    return numeroFase;
   };
 
   return (
@@ -17,7 +18,7 @@ const Fases = ({ fases }) => {
         <div
           key={index}
           className={`fase ${fase.desbloqueada ? 'desbloqueada' : 'bloqueada'}`}
-          onClick={() => handleFaseClick(fase.nome, fase.desbloqueada)}
+          onClick={() => handleFaseClick(fase.nome,fase.numero, fase.desbloqueada)}
         >
           {fase.nome}
         </div>

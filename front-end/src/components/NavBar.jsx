@@ -12,7 +12,7 @@ const NavBar = ({ fases }) => {
   const handleNavigateToNextPhase = () => {
     const ultimaFaseDesbloqueada = fases.slice().reverse().find(fase => fase.desbloqueada);
     if (ultimaFaseDesbloqueada) {
-      navigate(`/partida/${ultimaFaseDesbloqueada.nome}`);
+      navigate(`/partida/${ultimaFaseDesbloqueada.nome}/${ultimaFaseDesbloqueada.numero}`);
     }
   };
 

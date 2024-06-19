@@ -223,7 +223,6 @@ app.get("/grid", [
 ]);
 
 app.get("/grid/:id", [
-  verificaJWT,
   async (req, res, next) => {
     console.log("connecting with database");
     await banco.sync({ force: false });
@@ -232,7 +231,23 @@ app.get("/grid/:id", [
     if (req.params.id == null) {
       res.status(400).json({ error: "id is null" });
     } else {
-      res.status(200).json(gridToResponse(grid));
+      res
+        .status(200)
+        .json(
+          JSON.parse(
+            JSON.stringify(grid, [
+              "line0",
+              "line1",
+              "line2",
+              "line3",
+              "line4",
+              "line5",
+              "line6",
+              "line7",
+              "line8",
+            ])
+          )
+        );
     }
   },
 ]);

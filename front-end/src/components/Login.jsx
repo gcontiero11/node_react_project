@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import api from './axios/api';
 
 const Login = () => {
-  const [nome, setNome] = useState('');
-  const [senha, setSenha] = useState('');
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Lógica de login aqui
-    console.log('Login realizado com sucesso:', { nome, senha });
+    setError('');
+
+    try {
+      const response = await api.post('http://localhost:8000/user/login', { name, password });
+      console.log('Login realizado com sucesso:', response.data);
+      navigate('/');
+    } catch (err) {
+      setError('Falha no login. Verifique suas credenciais.');
+      console.error('Erro ao fazer login:', err);
+    }
   };
 
   return (
@@ -18,17 +30,18 @@ const Login = () => {
         <input
           type="text"
           placeholder="Nome"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           required
         />
         <input
           type="password"
           placeholder="Senha"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
+        {error && <p className="error">{error}</p>}
         <button type="submit">Logar</button>
       </form>
     </div>
