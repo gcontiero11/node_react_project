@@ -1,0 +1,47 @@
+.grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .row {
+    display: flex;
+  }
+  
+  .cell {
+    width: 30px; /* Ajuste o tamanho conforme necessário */
+    height: 30px; /* Ajuste o tamanho conforme necessário */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #000;
+    font-size: 20px;
+    cursor: pointer; /* Adiciona cursor de ponteiro para células clicáveis */
+  }
+  
+  .cell.immutable {
+    background-color: #e0e0e0; /* Cor de fundo para células imutáveis */
+    cursor: not-allowed; /* Cursor desativado para células imutáveis */
+  }
+  
+  .number-button {
+    margin: 5px;
+    padding: 10px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  .selected {
+    background-color: yellow;
+  }
+  
+  .clear-button {
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  .partida-container {
+    text-align: center;
+  }

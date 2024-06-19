@@ -1,0 +1,68 @@
+.partida-container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .sudoku-board {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-gap: 1px;
+    border: 1px solid #333;
+  }
+  
+  .sudoku-line {
+    display: flex;
+  }
+  
+  .sudoku-cell {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    height: 40px;
+    border: 1px solid #333;
+    cursor: pointer;
+  }
+  
+  .sudoku-cell.blocked {
+    background-color: #f0f0f0;
+    color: #666;
+  }
+  
+  .sudoku-cell:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .number-buttons {
+    margin-top: 10px;
+  }
+  
+  .number-button {
+    margin: 5px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    cursor: pointer;
+    border: 1px solid #333;
+    background-color: #f0f0f0;
+  }
+  
+  .number-button.selected {
+    background-color: #ccc;
+  }
+  
+  .clear-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #333;
+  }
+  
+  .clear-button:hover {
+    background-color: #e0e0e0;
+  }
+
+
