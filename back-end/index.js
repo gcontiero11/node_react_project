@@ -14,6 +14,33 @@ app.use([cors(), bodyParser.json()]);
 
 app.listen(port, () => {
   console.log("api está rodando na url base: http://localhost:8000/");
+  
+  if (!fs.existsSync("./database.db")) {
+    console.log("creating database");
+    (async () => {
+      await banco.sync({ force: false });
+      await createUserWithId(
+        9999,
+        {
+          name: "admin",
+          level: 99999,
+        },
+        "gub123"
+      );
+
+      await createGrid({
+        line0: "[-1,8,5,7,-1,6,9,3,-1]",
+        line1: "[7,-1,-1,1,0,0,0,8,0]",
+        line2: "[1,6,4,9,8,3,-1,-1,-1]",
+        line3: "[3,-1,1,-1,2,7,-1,-1,-1]",
+        line4: "[-1,-1,6,-1,-1,5,4,-1,-1]",
+        line5: "[-1,-1,8,-1,-1,9,7,1,6]",
+        line6: "[4,-1,9,-1,-1,-1,-1,-1,-1]",
+        line7: "[-1,-1,-1,5,6,4,3,9,7]",
+        line8: "[6,5,7,3,9,1,-1,4,-1]",
+      });
+    })();
+  }
 });
 
 //userController
@@ -206,7 +233,7 @@ app.post("/grid", [
   async (req, res, next) => {
     console.log("connecting with database");
     await banco.sync({ force: false });
-    const grid = await createGrid(req);
+    const grid = await createGrid(req.body);
     grid.save();
     res.status(201).json(gridToResponse(grid));
   },
@@ -261,7 +288,7 @@ function gridToResponse(grid) {
   );
 }
 
-async function createGrid(req) {
+async function createGrid(body) {
   return Grid.create({
     line0: body.line0,
     line1: body.line1,
@@ -297,7 +324,13 @@ app.get("/game", [
   async (req, res, next) => {
     try {
       const games = await Game.findAll();
-      res.json(games);
+      res
+        .status(200)
+        .json(
+          JSON.parse(
+            JSON.stringify(games, ["id", "difficult", "user_id_fk", "grid"])
+          )
+        );
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -325,6 +358,7 @@ app.post("/game", [
   async (req, res, next) => {
     try {
       const game = await createGame(req.body);
+      console.log(game);
       res.status(201).json(gameToResponse(game));
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -367,26 +401,18 @@ app.delete("/game/:id", [
 ]);
 
 async function createGame(body) {
-  const grid = Grid.findByPk(body.grid_id);
-  const gridContent = JSON.parse(
-    grid.line0 +
-      "," +
-      grid.line1 +
-      "," +
-      grid.line2 +
-      "," +
-      grid.line3 +
-      "," +
-      grid.line4 +
-      "," +
-      grid.line5 +
-      "," +
-      grid.line6 +
-      "," +
-      grid.line7 +
-      "," +
-      grid.line8
-  );
+  const grid = await Grid.findByPk(body.grid_id);
+  const gridContent = JSON.stringify([
+    grid.line0,
+    grid.line1,
+    grid.line2,
+    grid.line3,
+    grid.line4,
+    grid.line5,
+    grid.line6,
+    grid.line7,
+    grid.line8,
+  ]);
   return Game.create({
     difficult: body.difficult,
     hasEnded: false,
