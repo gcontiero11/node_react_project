@@ -14,7 +14,6 @@ app.use([cors(), bodyParser.json()]);
 
 app.listen(port, () => {
   console.log("api está rodando na url base: http://localhost:8000/");
-  
   if (!fs.existsSync("./database.db")) {
     console.log("creating database");
     (async () => {
@@ -29,57 +28,67 @@ app.listen(port, () => {
       );
 
       await createGrid({
-        line0: "[-1,8,5,7,-1,6,9,3,-1]",
-        line1: "[7,-1,-1,1,0,0,0,8,0]",
-        line2: "[1,6,4,9,8,3,-1,-1,-1]",
-        line3: "[3,-1,1,-1,2,7,-1,-1,-1]",
-        line4: "[-1,-1,6,-1,-1,5,4,-1,-1]",
-        line5: "[-1,-1,8,-1,-1,9,7,1,6]",
-        line6: "[4,-1,9,-1,-1,-1,-1,-1,-1]",
-        line7: "[-1,-1,-1,5,6,4,3,9,7]",
-        line8: "[6,5,7,3,9,1,-1,4,-1]",
+        line0: [-1, 8, 5, 7, -1, 6, 9, 3, -1],
+        line1: [7, -1, -1, 1, 0, 0, 0, 8, 0],
+        line2: [1, 6, 4, 9, 8, 3, -1, -1, -1],
+        line3: [3, -1, 1, -1, 2, 7, -1, -1, -1],
+        line4: [-1, -1, 6, -1, -1, 5, 4, -1, -1],
+        line5: [-1, -1, 8, -1, -1, 9, 7, 1, 6],
+        line6: [4, -1, 9, -1, -1, -1, -1, -1, -1],
+        line7: [-1, -1, -1, 5, 6, 4, 3, 9, 7],
+        line8: [6, 5, 7, 3, 9, 1, -1, 4, -1],
       });
     })();
   }
 });
 
 //userController
-app.get("/user", async (req, res, next) => {
-  console.log("connecting with database");
-  await banco.sync({ force: false });
-  const users = await User.findAll();
-  if (!users.every((user) => user instanceof User)) {
-    res.status(500).send("intruder on database");
-  } else {
-    const response = JSON.stringify(users, ["id", "name"], " ");
-    res.status(200).send(response);
-  }
-});
+app.get("/user", [
+  verificaJWT,
+  async (req, res, next) => {
+    console.log("connecting with database");
+    await banco.sync({ force: false });
+    const users = await User.findAll();
+    if (!users.every((user) => user instanceof User)) {
+      res.status(500).send("intruder on database");
+    } else {
+      const response = JSON.stringify(users, ["id", "name"], " ");
+      res.status(200).send(response);
+    }
+  },
+]);
 
-app.get("/user/:id", async (req, res, next) => {
-  console.log("connecting with database");
-  await banco.sync({ force: false });
-  if (req.params.id == null) {
-    res.status(400).send("id is null");
-  } else {
-    const user = await User.findByPk(req.params.id);
-    res.send({
-      id: user.id,
-      name: user.name,
-    });
-  }
-});
+app.get("/user/:id", [
+  verificaJWT,
+  async (req, res, next) => {
+    console.log("connecting with database");
+    await banco.sync({ force: false });
+    if (req.params.id == null) {
+      res.status(400).send("id is null");
+    } else {
+      const user = await User.findByPk(req.params.id);
+      res.send({
+        id: user.id,
+        name: user.name,
+      });
+    }
+  },
+]);
 
 app.post("/user", async (req, res, next) => {
   console.log("connecting with database");
   await banco.sync({ force: false });
-  const user = await createUser(req.body);
-  user.save();
-  res.status(201).send({
-    id: user.id,
-    name: user.name,
-    password: user.password,
-  });
+  try {
+    const user = await createUser(req.body);
+    user.save();
+    res.status(201).send({
+      id: user.id,
+      name: user.name,
+      password: user.password,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.post("/user/login", async (req, res, next) => {
@@ -358,7 +367,6 @@ app.post("/game", [
   async (req, res, next) => {
     try {
       const game = await createGame(req.body);
-      console.log(game);
       res.status(201).json(gameToResponse(game));
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -423,12 +431,6 @@ async function createGame(body) {
 
 function gameToResponse(game) {
   return JSON.parse(
-    JSON.stringify(game, [
-      "id",
-      "difficult",
-      "hasEnded",
-      "user_id_fk",
-      "grid_id_fk",
-    ])
+    JSON.stringify(game, ["id", "difficult", "user_id_fk", "grid"])
   );
 }
