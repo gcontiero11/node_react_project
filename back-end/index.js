@@ -1,7 +1,6 @@
 const banco = require("./bd.js");
 const express = require("express");
 const User = require("./model/User.js");
-const Game = require("./model/Game.js");
 const Grid = require("./model/Grid.js");
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
@@ -223,30 +222,35 @@ app.get("/grid", [
 
 app.get("/grid/:id", [
   async (req, res, next) => {
-    console.log("connecting with database");
-    await banco.sync({ force: false });
-    let grid = await Grid.findByPk(req.params.id);
-    if (grid == null) res.status(404).json({ error: "Grid not found" });
-    if (req.params.id == null) {
-      res.status(400).json({ error: "id is null" });
-    } else {
-      res
-        .status(200)
-        .json(
-          JSON.parse(
-            JSON.stringify(grid, [
-              "line0",
-              "line1",
-              "line2",
-              "line3",
-              "line4",
-              "line5",
-              "line6",
-              "line7",
-              "line8",
-            ])
-          )
-        );
+    try{
+      console.log("connecting with database");
+      await banco.sync({ force: false });
+      let grid = await Grid.findByPk(req.params.id);
+      if (grid == null) res.status(404).json({ error: "Grid not found" });
+      if (req.params.id == null) {
+        res.status(400).json({ error: "id is null" });
+      } else {
+        res
+          .status(200)
+          .json(
+            JSON.parse(
+              JSON.stringify(grid, [
+                "line0",
+                "line1",
+                "line2",
+                "line3",
+                "line4",
+                "line5",
+                "line6",
+                "line7",
+                "line8",
+              ])
+            )
+          );
+      }
+    }
+    catch(error){
+      res.status(500).json(error.message);
     }
   },
 ]);
@@ -338,113 +342,4 @@ async function createGridWithId(params, body) {
     line7: body.line7,
     line8: body.line8,
   });
-}
-
-//Game Controller
-
-app.get("/game", [
-  verificaJWT,
-  async (req, res, next) => {
-    try {
-      const games = await Game.findAll();
-      res
-        .status(200)
-        .json(
-          JSON.parse(
-            JSON.stringify(games, ["id", "difficult", "user_id_fk", "grid"])
-          )
-        );
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
-]);
-
-app.get("/game/:id", [
-  verificaJWT,
-  async (req, res, next) => {
-    try {
-      const game = await Game.findByPk(req.params.id);
-      if (game) {
-        res.json(gameToResponse(game));
-      } else {
-        res.status(404).json({ error: "Game not found" });
-      }
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
-]);
-
-app.post("/game", [
-  verificaJWT,
-  async (req, res, next) => {
-    try {
-      const game = await createGame(req.body);
-      res.status(201).json(gameToResponse(game));
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-]);
-
-app.put("/game/:id", [
-  verificaJWT,
-  async (req, res, next) => {
-    try {
-      const game = await Game.findByPk(req.params.id);
-      if (game) {
-        await game.update(req.body);
-        res.json(game);
-      } else {
-        res.status(404).json({ error: "Game not found" });
-      }
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-]);
-
-app.delete("/game/:id", [
-  verificaJWT,
-  async (req, res, next) => {
-    try {
-      const game = await Game.findByPk(req.params.id);
-      if (game) {
-        await game.destroy();
-        res.status(204).end();
-      } else {
-        res.status(404).json({ error: "Game not found" });
-      }
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
-]);
-
-async function createGame(body) {
-  const grid = await Grid.findByPk(body.grid_id);
-  const gridContent = JSON.stringify([
-    grid.line0,
-    grid.line1,
-    grid.line2,
-    grid.line3,
-    grid.line4,
-    grid.line5,
-    grid.line6,
-    grid.line7,
-    grid.line8,
-  ]);
-  return Game.create({
-    difficult: body.difficult,
-    hasEnded: false,
-    user_id_fk: body.user_id,
-    grid: gridContent,
-  });
-}
-
-function gameToResponse(game) {
-  return JSON.parse(
-    JSON.stringify(game, ["id", "difficult", "user_id_fk", "grid"])
-  );
 }
