@@ -97,7 +97,6 @@ app.post("/user/login", async (req, res, next) => {
   if (req.body.password == user.password) {
     let pass = user.password;
 
-    //criar o JWT
     const createSecretKey = fs.readFileSync("./chaves/private.key", "utf8");
     const token = jwt.sign({ pass }, createSecretKey, {
       algorithm: "RS256",
